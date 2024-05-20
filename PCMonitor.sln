@@ -5,7 +5,7 @@ VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenHardwareMonitorLib", "openhardwaremonitor\OpenHardwareMonitorLib.csproj", "{B0397530-545A-471D-BB74-027AE456DF1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCMonitor", "PCMonitor\PCMonitor.csproj", "{B0137597-3948-4D27-B060-61113BC4212C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCMonitor", "PCMonitor\PCMonitor.csproj", "{08497FE9-AA23-48E6-9956-9801D4401564}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{B0397530-545A-471D-BB74-027AE456DF1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0397530-545A-471D-BB74-027AE456DF1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0397530-545A-471D-BB74-027AE456DF1A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B0137597-3948-4D27-B060-61113BC4212C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B0137597-3948-4D27-B060-61113BC4212C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B0137597-3948-4D27-B060-61113BC4212C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B0137597-3948-4D27-B060-61113BC4212C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08497FE9-AA23-48E6-9956-9801D4401564}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08497FE9-AA23-48E6-9956-9801D4401564}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08497FE9-AA23-48E6-9956-9801D4401564}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08497FE9-AA23-48E6-9956-9801D4401564}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

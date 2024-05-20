@@ -1,0 +1,39 @@
+﻿<Window x:Class="PCMonitor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PCMonitor"
+        mc:Ignorable="d"
+        Title="PCMonitor" Height="450" Width="800"
+        SizeChanged="Window_SizeChanged">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <ListBox Name="COMPorts">
+            <ListBoxItem Content="Some"></ListBoxItem>
+            <ListBoxItem Content="COM"></ListBoxItem>
+            <ListBoxItem Content="Ports"></ListBoxItem>
+        </ListBox>
+
+        <Grid Name="ElementsPanel" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <TreeView Name="ElementsTree">
+                <TreeViewItem Header="A">
+                    <TreeViewItem Header="Tree">
+                        <TreeViewItem Header="View"></TreeViewItem>
+                    </TreeViewItem>
+                </TreeViewItem>
+            </TreeView>
+
+            <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">Put something else here</TextBlock>
+        </Grid>
+    </Grid>
+</Window>
