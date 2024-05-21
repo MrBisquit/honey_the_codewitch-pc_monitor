@@ -131,4 +131,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>"$(SolutionDir)lexgen.exe" "$(ProjectDir)json.rl" /class JsonTextReaderRunner /namespace PCMonitor /textreader /staticprogress /output "$(ProjectDir)JsonRunners.cs"</PreBuildEvent>
+  </PropertyGroup>
 </Project>
