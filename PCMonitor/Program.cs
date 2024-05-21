@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.Principal;
 using System.ServiceProcess;
 using System.Threading;
 
@@ -44,10 +45,16 @@ namespace SelfServeDemo
 				{
 					if (0 == args.Length)
 					{
-						//_PrintUsage();
-						//return 0;
-
+						var svcThread = new Thread(new ThreadStart(() => {
+							_StartService(svctmp, ServiceInstaller.IsInstalled(svctmp.ServiceName));
+						}));
+						
 						App.Main();
+						
+						//_PrintUsage();
+						 //return 0;
+
+						
 					}
 					if (1 != args.Length)
 					{
@@ -55,6 +62,10 @@ namespace SelfServeDemo
 					}
 					switch (args[0])
 					{
+						case "/?":
+						case "/help":
+							_PrintUsage();
+							break;
 						case "/status":
 							_PrintStatus(svctmp.ServiceName);
 							break;
@@ -181,11 +192,11 @@ namespace SelfServeDemo
 			if (isInstalled)
 			{
 				ServiceInstaller.StartService(svc.ServiceName);
-				_PrintStatus(svc.ServiceName);
+				//_PrintStatus(svc.ServiceName);
 			}
 			else
 			{
-				_PrintStatus(svc.ServiceName,isInstalled,true);
+				//_PrintStatus(svc.ServiceName,isInstalled,true);
 				_RunService(svc);
 			}
 
@@ -229,6 +240,38 @@ namespace SelfServeDemo
 			t.WriteLine("   /status     Reports if the service is installed and/or running.");
 			t.WriteLine();
 
+		}
+		
+		// Modified but mostly copied from https://stackoverflow.com/a/41617624
+		public static void RestartElevated()
+		{
+			if (IsRunAsAdmin()) return;
+
+
+			ProcessStartInfo proc = new ProcessStartInfo();
+			proc.UseShellExecute = true;
+			proc.WorkingDirectory = Environment.CurrentDirectory;
+			proc.FileName = Assembly.GetEntryAssembly().CodeBase;
+
+			foreach (string arg in Environment.GetCommandLineArgs())
+			{
+				proc.Arguments += String.Format("\"{0}\" ", arg.Replace("\"","\"\""));
+			}
+
+			proc.Verb = "runas";
+			Process.Start(proc);
+
+			// Kill the current application
+
+			Environment.Exit(0);
+		}
+
+		public static bool IsRunAsAdmin()
+		{
+			WindowsIdentity id = WindowsIdentity.GetCurrent();
+			WindowsPrincipal principal = new WindowsPrincipal(id);
+
+			return principal.IsInRole(WindowsBuiltInRole.Administrator);
 		}
 		#region ServiceInstaller and support (adapted from https://stackoverflow.com/questions/358700/how-to-install-a-windows-service-programmatically-in-c)
 		public static class ServiceInstaller

@@ -28,13 +28,24 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.JsonWatcher = new System.IO.FileSystemWatcher();
+			((System.ComponentModel.ISupportInitialize)(this.JsonWatcher)).BeginInit();
+			// 
+			// JsonWatcher
+			// 
+			this.JsonWatcher.EnableRaisingEvents = true;
+			this.JsonWatcher.Filter = "pcmon.json";
+			this.JsonWatcher.NotifyFilter = ((System.IO.NotifyFilters)((System.IO.NotifyFilters.FileName | System.IO.NotifyFilters.LastWrite)));
 			// 
 			// Service
 			// 
 			this.ServiceName = "SelfServe";
+			((System.ComponentModel.ISupportInitialize)(this.JsonWatcher)).EndInit();
 
 		}
 
 		#endregion
+
+		private System.IO.FileSystemWatcher JsonWatcher;
 	}
 }
