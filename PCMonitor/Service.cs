@@ -5,14 +5,16 @@ using PCMonitor;
 using System;
 using System.IO;
 using System.IO.Ports;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.ServiceProcess;
-
-namespace SelfServeDemo
+using Timer = System.Timers.Timer;
+namespace PCMonitor
 {
 	partial class Service : ServiceBase
 	{
 		const int Baud = 115200;
+		Timer _updateTimer;
 		private readonly Computer _computer = new Computer
 		{
 			CPUEnabled = true,
@@ -36,15 +38,16 @@ namespace SelfServeDemo
 		}
 		ISensor FindSensor(string identifier)
 		{
-			try
-			{
+			//try
+			//{
 				return FindSensor(identifier, _computer);
-			}
-			catch { }
-			return null;
+			//}
+			//catch { }
+			//return null;
 		}
 		static ISensor FindSensor(string identifier, object current)
 		{
+			
 			if (current == null || string.IsNullOrEmpty(identifier))
 			{
 				return null;
@@ -115,16 +118,24 @@ namespace SelfServeDemo
 			JsonWatcher.Changed += JsonWatcher_Changed;
 			JsonWatcher.Created += JsonWatcher_Created;
 			JsonWatcher.Deleted += JsonWatcher_Deleted;
+			_updateTimer = new Timer(100);
+			_updateTimer.Elapsed += _UpdateTimer_Elapsed;
+
+			var fullpath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName), "pcmon.json");
+			if (File.Exists(fullpath)) {
+				LoadConfigs(fullpath);
+			}
+			CollectSystemInfo();
 			JsonWatcher.EnableRaisingEvents = true;
-			UpdateTimer.Enabled = false;
-			UpdateTimer.Tick += UpdateTimer_Tick;
+
 		}
 
-		private void UpdateTimer_Tick(object sender, System.EventArgs e)
+		private void _UpdateTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
 		{
 			// use OpenHardwareMonitorLib to collect the system info
 			var updateVisitor = new UpdateVisitor();
 			_computer.Accept(updateVisitor);
+			
 			// go through all the ports
 			int i = 0;
 			if (_configs != null)
@@ -173,9 +184,11 @@ namespace SelfServeDemo
 			}
 		}
 
+		
+
 		void DeleteConfigs()
 		{
-			UpdateTimer.Enabled = false;
+			_updateTimer.Enabled = false;
 			if (_configs != null)
 			{
 				foreach (var cfg in _configs)
@@ -194,6 +207,85 @@ namespace SelfServeDemo
 					catch { }
 				}
 				_configs = new Config[0];
+				try
+				{
+					_computer.Close();
+				}
+				catch
+				{
+
+				}
+			}
+		}
+		float cpuUsage;
+		string cpuUsageId;
+		float gpuUsage;
+		string gpuUsageId;
+		float cpuTemp;
+		string cpuTempId;
+		float cpuTjMax;
+		float gpuTemp;
+		string gpuTempId;
+		bool isNvidia;
+		void CollectSystemInfo()
+		{
+			// use OpenHardwareMonitorLib to collect the system info
+			var updateVisitor = new UpdateVisitor();
+			_computer.Accept(updateVisitor);
+			isNvidia = false;
+			for (int i = 0; i < _computer.Hardware.Length; i++)
+			{
+				if (_computer.Hardware[i].HardwareType == HardwareType.CPU)
+				{
+					for (int j = 0; j < _computer.Hardware[i].Sensors.Length; j++)
+					{
+						var sensor = _computer.Hardware[i].Sensors[j];
+						if (sensor.SensorType == SensorType.Temperature &&
+							sensor.Name.Contains("CPU Package"))
+						{
+							for (int k = 0; k < sensor.Parameters.Length; ++k)
+							{
+								var p = sensor.Parameters[i];
+								if (p.Name.ToLowerInvariant().Contains("tjmax"))
+								{
+									cpuTjMax = (float)p.Value;
+								}
+							}
+							cpuTemp = sensor.Value.GetValueOrDefault();
+							cpuTempId = sensor.Identifier.ToString();
+						}
+						else if (sensor.SensorType == SensorType.Load &&
+							sensor.Name.Contains("CPU Total"))
+						{
+							// store
+							cpuUsage = sensor.Value.GetValueOrDefault();
+							cpuUsageId = sensor.Identifier.ToString();
+						}
+					}
+				}
+				if (_computer.Hardware[i].HardwareType == HardwareType.GpuAti ||
+					_computer.Hardware[i].HardwareType == HardwareType.GpuNvidia)
+				{
+					isNvidia = _computer.Hardware[i].HardwareType == HardwareType.GpuNvidia;
+					for (int j = 0; j < _computer.Hardware[i].Sensors.Length; j++)
+					{
+						var sensor = _computer.Hardware[i].Sensors[j];
+						if (sensor.SensorType == SensorType.Temperature &&
+							sensor.Name.Contains("GPU Core"))
+						{
+							// store
+							gpuTemp = sensor.Value.GetValueOrDefault();
+							gpuTempId = sensor.Identifier.ToString();
+						}
+						else if (sensor.SensorType == SensorType.Load &&
+							sensor.Name.Contains("GPU Core"))
+						{
+							// store
+							gpuUsage = sensor.Value.GetValueOrDefault();
+							gpuUsageId = sensor.Identifier.ToString();
+						}
+					}
+				}
 			}
 		}
 		void LoadConfigs(string fullpath)
@@ -205,7 +297,12 @@ namespace SelfServeDemo
 				{
 					_configs = Config.ReadFrom(reader);
 				}
-				UpdateTimer.Enabled = true;
+				foreach(var cfg in _configs)
+				{
+					cfg.Port = new SerialPort(cfg.PortName, Baud);
+				}
+				_computer.Open();
+				_updateTimer.Enabled = true;
 			}
 			catch
 			{

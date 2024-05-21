@@ -1,4 +1,4 @@
-﻿namespace SelfServeDemo
+﻿namespace PCMonitor
 {
 	partial class Service
 	{
@@ -28,9 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.components = new System.ComponentModel.Container();
 			this.JsonWatcher = new System.IO.FileSystemWatcher();
-			this.UpdateTimer = new System.Windows.Forms.Timer(this.components);
 			((System.ComponentModel.ISupportInitialize)(this.JsonWatcher)).BeginInit();
 			// 
 			// JsonWatcher
@@ -49,6 +47,5 @@
 		#endregion
 
 		private System.IO.FileSystemWatcher JsonWatcher;
-		private System.Windows.Forms.Timer UpdateTimer;
 	}
 }

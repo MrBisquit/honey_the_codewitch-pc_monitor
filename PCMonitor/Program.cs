@@ -8,10 +8,11 @@ using System.Security.Principal;
 using System.ServiceProcess;
 using System.Threading;
 
-namespace SelfServeDemo
+namespace PCMonitor
 {
 	static class Program
 	{
+
 		static readonly string _FilePath = Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName;
 		static readonly string _File = Assembly.GetExecutingAssembly().GetModules()[0].Name;
         [STAThread]
@@ -45,12 +46,8 @@ namespace SelfServeDemo
 				{
 					if (0 == args.Length)
 					{
-						var svcThread = new Thread(new ThreadStart(() => {
-							_StartService(svctmp, ServiceInstaller.IsInstalled(svctmp.ServiceName));
-						}));
-						
+						StartExternal();
 						App.Main();
-						
 						//_PrintUsage();
 						 //return 0;
 
@@ -141,10 +138,12 @@ namespace SelfServeDemo
 						// so we reflect
 						var args = new string[0];
 						type.InvokeMember("OnStart", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance, null, svc, new object[] { args });
+						
 						while (true)
 						{
 							Thread.Sleep(0);
 						}
+						
 					});
 					thread.Start();
 					thread.Join();
@@ -243,27 +242,31 @@ namespace SelfServeDemo
 		}
 		
 		// Modified but mostly copied from https://stackoverflow.com/a/41617624
-		public static void RestartElevated()
+		public static void StartExternal()
 		{
-			if (IsRunAsAdmin()) return;
-
-
 			ProcessStartInfo proc = new ProcessStartInfo();
 			proc.UseShellExecute = true;
 			proc.WorkingDirectory = Environment.CurrentDirectory;
 			proc.FileName = Assembly.GetEntryAssembly().CodeBase;
+			proc.CreateNoWindow = true;
+			proc.Arguments = "/start";
+			
+			proc.Verb = "runas";
+			Process.Start(proc);
 
-			foreach (string arg in Environment.GetCommandLineArgs())
-			{
-				proc.Arguments += String.Format("\"{0}\" ", arg.Replace("\"","\"\""));
-			}
+		}
+		public static void StopExternal()
+		{
+			ProcessStartInfo proc = new ProcessStartInfo();
+			proc.UseShellExecute = true;
+			proc.WorkingDirectory = Environment.CurrentDirectory;
+			proc.FileName = Assembly.GetEntryAssembly().CodeBase;
+			proc.CreateNoWindow = true;
+			proc.Arguments = "/stop";
 
 			proc.Verb = "runas";
 			Process.Start(proc);
 
-			// Kill the current application
-
-			Environment.Exit(0);
 		}
 
 		public static bool IsRunAsAdmin()
