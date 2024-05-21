@@ -134,6 +134,10 @@ namespace PCMonitor
 				}
 			}
 		}
+		public SerialPort PortIfCreated
+		{
+			get { return _port; }
+		}
 		public SerialPort Port
 		{
 			get
