@@ -41,6 +41,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -60,6 +61,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Config.cs" />
+    <Compile Include="HsvColor.cs" />
+    <Compile Include="Interface.cs" />
+    <Compile Include="JsonElement.cs" />
+    <Compile Include="JsonException.cs" />
+    <Compile Include="JsonParser.cs" />
+    <Compile Include="JsonRunners.cs" />
+    <Compile Include="JsonUtility.cs" />
+    <Compile Include="JsonWriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Service.cs">
       <SubType>Component</SubType>
@@ -103,6 +113,8 @@
       <DependentUpon>Service.cs</DependentUpon>
     </EmbeddedResource>
     <None Include=".gitignore" />
+    <None Include="json.rl" />
+    <None Include="pcmonitor.json" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
